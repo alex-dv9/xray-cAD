@@ -1,0 +1,15 @@
+{
+    "telegram_users_whitelist": [],
+    "telegram_bot_token": "",
+    "xray_wireguard_outbound_privatekey": "",
+    "xray_wireguard_outbound_publickey": "",
+    "xray_wireguard_outbound_peeraddress": "",
+    "xray_wireguard_outbound_endpoint": "",
+    "xray_wireguard_outbound_dnsserver": "",
+    "xray_wireguard_outbound_mtu": 1380,
+    "xray_shadowsocks_inbound_method": "aes-256-gcm",
+    "xray_shadowsocks_inbound_network": "udp,tcp",
+    "xray_inbound_separated_instances": {
+        "shadowsocks_instances_count": 3
+    }
+}

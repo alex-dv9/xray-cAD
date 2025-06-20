@@ -1,0 +1,18 @@
+#/etc/systemd/system/xray-cAD.service
+#systemctl daemon-reload
+#systemctl enable --now xray-cAD.service
+
+#replace /root/xray-cAD to actual repository directorry
+#same for /root/xray-cAD/.venv/bin/python and /root/xray-cAD/main.py
+
+[Unit]
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/root/xray-cAD
+ExecStart=/root/xray-cAD/.venv/bin/python /root/xray-cAD/src/main.py
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
