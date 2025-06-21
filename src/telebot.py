@@ -26,12 +26,12 @@ def main(bot_token:str, users_whitelist:list, config, tmpdir):
         if update.message is not None and update.message.chat_id in users_whitelist:
             
             help_answer = (
-                "/help - show this message\n",
-                "/restart - purge all configuration files and restart xray-cad\n",
-                "/shutdown - turn off xray-cAD"
-                "/lc - request list of all currently running inbound instances\n",
-                "/gc - request configuration file for specific inbound instance\n",
-                "/rc - refurbish (purge) specific inbound instance configuration",
+                "/help - show this message message\n",
+                "/restart - restart system and wipe all configs\n",
+                "/shutdown - shut down xray-cAD\n",
+                "/lc - list active inbound istances\n",
+                "/gc - get config for an instance\n",
+                "/rc - reset (refurbish) an instance",
             )
             
             await update.message.reply_text("".join(help_answer))
@@ -39,7 +39,7 @@ def main(bot_token:str, users_whitelist:list, config, tmpdir):
     async def restart_command_handler(update:Update, context:ContextTypes.DEFAULT_TYPE) -> None:
         if update.message is not None and update.message.chat_id in users_whitelist:
             
-            await update.message.reply_text("Regenerating xray-core config and docker compose... Restarting docker compose...")
+            await update.message.reply_text("Restarting... Cleaning old configs and restarting services.")
 
             # some other functions except that EXCACTLY tmpdir (with it's unique name) exists - so it's can't be deleted.
             remove_content_of_tmpdir(tmpdir=tmpdir)
@@ -50,15 +50,15 @@ def main(bot_token:str, users_whitelist:list, config, tmpdir):
             stop_docker_compose(tmpdir)
             run_docker_compose(tmpdir)
 
-            await update.message.reply_text("System was successfully restarted. All your configuration files are gone now. Feel free to request new ones from me.")
-    
+            await update.message.reply_text("Restart complete. All configs wiped. Request for new if needed.")
+   
     async def shutdown_command_handler(update:Update, context:ContextTypes.DEFAULT_TYPE) -> None:
         if update.message is not None and update.message.chat_id in users_whitelist:
 
             stop_docker_compose(tmpdir)
             remove_tmpdir(tmpdir)
 
-            await update.message.reply_text("System is about to shutdown... Goodbye!")
+            await update.message.reply_text("Shutting down... Goodbye!")
 
             sys.exit(0)
 
@@ -72,7 +72,7 @@ def main(bot_token:str, users_whitelist:list, config, tmpdir):
                 tag = request_instance_tag(config=config, tmpdir=tmpdir, instance_num=instance_num)
                 inbound_instances_str = inbound_instances_str + f"{tag}\n"
 
-            await update.message.reply_text(inbound_instances_str)
+            await update.message.reply_text(f"Active inbound instances:\n\n{inbound_instances_str}")
 
     async def gc_command_handler(update:Update, context:ContextTypes.DEFAULT_TYPE) -> None:
         if update.message is not None and update.message.chat_id in users_whitelist:
@@ -88,7 +88,7 @@ def main(bot_token:str, users_whitelist:list, config, tmpdir):
 
             reply_markup = InlineKeyboardMarkup(keyboard)
 
-            await update.message.reply_text(text="Which instance do you want the configuration file for?", reply_markup=reply_markup)
+            await update.message.reply_text(text="Which instance do you want the config for?", reply_markup=reply_markup)
 
     async def rc_command_handler(update:Update, context:ContextTypes.DEFAULT_TYPE) -> None:
         if update.message is not None and update.message.chat_id in users_whitelist:
@@ -158,7 +158,7 @@ def main(bot_token:str, users_whitelist:list, config, tmpdir):
     application.add_handler(CommandHandler("shutdown", shutdown_command_handler))
     application.add_handler(CommandHandler("lc", lc_command_handler))
     application.add_handler(CommandHandler("gc", gc_command_handler))
-    application.add_handler(CommandHandler("rb", rc_command_handler))
+    application.add_handler(CommandHandler("rc", rc_command_handler))
     
     application.add_handler(CallbackQueryHandler(gc_buttons_callback_handler, pattern="^getconfigforinboundnum:\\d+$"))
     application.add_handler(CallbackQueryHandler(rc_buttons_callback_handler, pattern="^refurbishinboundnum:\\d+$"))
